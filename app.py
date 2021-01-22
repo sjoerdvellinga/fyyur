@@ -22,17 +22,12 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 
-# TODO: to run on other localmachine, replace username vellinga
-# TODO: in terminal run '$ createdb fyyur' to create db
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vellinga@localhost:5432/fyyur'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 # TODO: initialize Flask migrate in terminal '$ flask db init'
 
-# TODO: connect to a local postgresql database
+# See config.py foir connection to local postgresql database
 
 #----------------------------------------------------------------------------#
 # Models.

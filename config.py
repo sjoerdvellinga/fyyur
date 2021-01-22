@@ -8,6 +8,9 @@ DEBUG = True
 
 # Connect to the database
 
+# TODO: to run on other localmachine, replace username 'vellinga'
+# TODO: in terminal run '$ createdb fyyur' to create db
 
 # TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = '<Put your local database url>'
+SQLALCHEMY_DATABASE_URI = 'postgres://vellinga@localhost:5432/fyyur'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
