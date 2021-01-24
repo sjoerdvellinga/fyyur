@@ -27,14 +27,13 @@ migrate = Migrate(app, db)
 
 # TODO: initialize Flask migrate in terminal '$ flask db init'
 
-# See config.py foir connection to local postgresql database
+# See config.py for connection to local postgresql database
 
-#----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -48,7 +47,7 @@ class Venue(db.Model):
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -85,12 +84,13 @@ app.jinja_env.filters['datetime'] = format_datetime
 def index():
   return render_template('pages/home.html')
 
-
+#  ----------------------------------------------------------------#
 #  Venues
-#  ----------------------------------------------------------------
+#  ----------------------------------------------------------------#
 
 @app.route('/venues')
 def venues():
+  return render_template('pages/venues.html')
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[{
