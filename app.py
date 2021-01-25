@@ -90,7 +90,7 @@ def index():
 
 @app.route('/venues')
 def venues():
-  return render_template('pages/venues.html')
+  return render_template('pages/venues.html', areas = Venue.query.distinct('city','state').all())
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[{
@@ -248,6 +248,7 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
+  return render_template('pages/artists.html', artists=Artist.query.all())
   # TODO: replace with real data returned from querying the database
   data=[{
     "id": 4,
