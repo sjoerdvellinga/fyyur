@@ -83,9 +83,9 @@ class Show(db.Model):
     __tablename__ = 'Show'
 
     id = db.Column(Integer,primary_key=True)
-    venue_id = db.Column(Integer, ForeignKey(Venue.id), nullable=False)
-    artist_id = db.Column(Integer, ForeignKey(Artist.id), nullable=False)
-    start_time = db.Column(String(), nullable=False)
+    venue_id = db.Column(db.Integer, ForeignKey(Venue.id), nullable=False)
+    artist_id = db.Column(db.Integer, ForeignKey(Artist.id), nullable=False)
+    start_time = db.Column(db.String(), nullable=False)
 
     def __repr__(self):
       return f'<Show: {self.id} - {self.venue_id} - {self.artist_id} / {self.start_time}>'
