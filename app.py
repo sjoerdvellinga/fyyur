@@ -48,7 +48,7 @@ class Venue(db.Model):
     description = db.Column(db.String(500), default='')
     seeking_talent = db.Column(db.Boolean, default=False)
     website = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(String))
+    genres = db.Column(db.ARRAY(db.String))
     shows = db.relationship('Show', backref='Venue', lazy='dynamic')
 
     def __repr__(self):
