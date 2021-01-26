@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -13,6 +13,8 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
+from sqlalchemy import func
+import sys
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -43,6 +45,14 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    description = db.Column(db.String(500), default='')
+    seeking_talent = db.Column(Boolean, default=False)
+    website = db.Column(String(120))
+    genres = db.Column(ARRAY(String))
+    shows = db.relationship('Show', backref='Venue', lazy='dynamic')
+
+    def __repr__(self):
+      return f'<Venue: {self.id} - {self.name} - {self.description}>'
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -57,10 +67,28 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String(120), default=' ')
+    website = db.Column(db.String(120))
+    shows = db.relationship('Show', backref='Artist', lazy=True)
+
+    def __repr__(self):
+      return f'<Artist: {self.id} - {self.name}>'
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+class Show(db.Model):
+    __tablename__ = 'Show'
+
+    id = db.Column(Integer,primary_key=True)
+    venue_id = db.Column(Integer, ForeignKey(Venue.id), nullable=False)
+    artist_id = db.Column(Integer, ForeignKey(Artist.id), nullable=False)
+    start_time = db.Column(String(), nullable=False)
+
+    def __repr__(self):
+      return f'<Show: {self.id} - {self.venue_id} - {self.artist_id} / {self.start_time}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -90,10 +118,32 @@ def index():
 
 @app.route('/venues')
 def venues():
-  return render_template('pages/venues.html', areas = Venue.query.distinct('city','state').all())
+# TODO: replace with real venues data.
+  #       num_shows should be aggregated based on number of upcoming shows per venue.
+  data = []
+  current_time = datetime.now().strftime('%Y-%m-%d %H:%S:%M')
+  data.append({"data-time": current_time})
+  venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
+  venue_location = ''
+
+  for venue in venues:
+    print(venue)
+    venue_location == venue.city + venue.state
+    data.append({
+      "city":venue.city,
+      "state":venue.state,
+      "venues": [{
+        "id": venue.id,
+        "name":venue.name,
+        }]
+      })
+
+
+  return render_template('pages/venues.html', areas=data)
+
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
+  data_OLD=[{
     "city": "San Francisco",
     "state": "CA",
     "venues": [{
