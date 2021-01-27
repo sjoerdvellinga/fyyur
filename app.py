@@ -80,7 +80,7 @@ class Artist(db.Model):
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 class Show(db.Model):
-    __tablename__ = 'Show'
+    __tablename__ = 'show'
 
     id = db.Column(db.Integer,primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
@@ -118,16 +118,21 @@ def index():
 
 @app.route('/venues')
 def venues():
+
+  current_time = datetime.now().strftime('%Y-%m-%d %H:%S:%M')
   data = []
+  
   area = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()  
   for location in area:
     city = location[0]
     state = location[1]
-    venues = Venue.query.filter_by(city=city, state=state).all()   
+    venues = Venue.query.filter_by(city=city, state=state).all()
+    upcoming_shows = Venue.shows.filter(Show.start_time > current_time).all()
     data.append({
       "city": city,
       "state": state,
-      "venues": venues
+      "venues": venues,
+      "num_upcoming_shows": len(upcoming_shows)
       })
 
   return render_template('pages/venues.html', areas=data)
