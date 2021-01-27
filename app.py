@@ -118,53 +118,46 @@ def index():
 
 @app.route('/venues')
 def venues():
-# TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
   data = []
-  current_time = datetime.now().strftime('%Y-%m-%d %H:%S:%M')
-  data.append({"data-time": current_time})
-  venues = Venue.query.group_by(Venue.id, Venue.state, Venue.city).all()
-  venue_location = ''
-
-  for venue in venues:
-    print(venue)
-    venue_location == venue.city + venue.state
+  area = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()  
+  for location in area:
+    city = location[0]
+    state = location[1]
+    venues = Venue.query.filter_by(city=city, state=state).all()   
     data.append({
-      "city":venue.city,
-      "state":venue.state,
-      "venues": [{
-        "id": venue.id,
-        "name":venue.name,
-        }]
+      "city": city,
+      "state": state,
+      "venues": venues
       })
-
 
   return render_template('pages/venues.html', areas=data)
 
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data_OLD=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+# '''
+#   # TODO: replace with real venues data.
+#   #       num_shows should be aggregated based on number of upcoming shows per venue.
+#   data_OLD=[{
+#     "city": "San Francisco",
+#     "state": "CA",
+#     "venues": [{
+#       "id": 1,
+#       "name": "The Musical Hop",
+#       "num_upcoming_shows": 0,
+#     }, {
+#       "id": 3,
+#       "name": "Park Square Live Music & Coffee",
+#       "num_upcoming_shows": 1,
+#     }]
+#   }, {
+#     "city": "New York",
+#     "state": "NY",
+#     "venues": [{
+#       "id": 2,
+#       "name": "The Dueling Pianos Bar",
+#       "num_upcoming_shows": 0,
+#     }]
+#   }]
+#   return render_template('pages/venues.html', areas=data);
+# '''
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
