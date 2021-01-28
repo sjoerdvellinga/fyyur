@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+
 import json
 import dateutil.parser
 import babel
@@ -39,17 +40,17 @@ class Venue(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    address = db.Column(db.String(120))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
+    country = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    description = db.Column(db.String(500), default='')
-    seeking_talent = db.Column(db.Boolean, default=False)
     website = db.Column(db.String(120))
     genres = db.Column(db.ARRAY(db.String))
-    shows = db.relationship('Show', backref='Venue', lazy='dynamic')
+    seek_talent = db.Column(db.Boolean, default=False)
+    seek_description = db.Column(db.String(500), default='')
 
     def __repr__(self):
       return f'<Venue: {self.id} - {self.name} - {self.description}>'
@@ -132,7 +133,8 @@ def venues():
       "city": city,
       "state": state,
       "venues": venues,
-      "num_upcoming_shows": len(upcoming_shows)
+      "now": current_time,
+      #"num_upcoming_shows": len(upcoming_shows)
       })
 
   return render_template('pages/venues.html', areas=data)
