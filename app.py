@@ -1,4 +1,4 @@
-#----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
 
@@ -15,6 +15,8 @@ from flask_wtf import Form
 from forms import *
 from flask_migrate import Migrate
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
+import traceback
 import sys
 
 #----------------------------------------------------------------------------#
@@ -51,6 +53,33 @@ class Venue(db.Model):
     genres = db.Column(db.ARRAY(db.String))
     seek_talent = db.Column(db.Boolean, default=False)
     seek_description = db.Column(db.String(500), default='')
+    shows = db.relationship('Show', backref='venue', lazy=True)
+
+    def create(self):
+      db.session.add(self)
+      db.session.commit()
+
+    def delete(self):
+      db.session.delete(self)
+      db.session.commit()
+
+    @property 
+    def upcoming_shows(self):
+      upcoming_shows = [show for show in self.shows if show.show_time > datetime.now()] #datetime.strptime(show.start_time, '%Y-%m-%d %H:%M:%S') > now]
+      return upcoming_shows
+    
+    @property
+    def num_upcoming_shows(self):
+      return len(self.upcoming_shows)
+    
+    @property
+    def past_shows(self):
+      past_shows = [show for show in self.planned_shows if show.show_time < datetime.now()]
+      return past_shows
+    
+    @property
+    def num_past_shows(self):
+      return len(self.past_shows)
 
     def __repr__(self):
       return f'<Venue: {self.id} - {self.name} - {self.description}>'
@@ -71,7 +100,7 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(120), default=' ')
     website = db.Column(db.String(120))
-    shows = db.relationship('Show', backref='Artist', lazy=True)
+    booked_shows = db.relationship('Show', backref='artist', lazy=True)
 
     def __repr__(self):
       return f'<Artist: {self.id} - {self.name}>'
@@ -84,12 +113,13 @@ class Show(db.Model):
     __tablename__ = 'show'
 
     id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(120), nullable=True)
     venue_id = db.Column(db.Integer, db.ForeignKey(Venue.id), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
-    start_time = db.Column(db.String(), nullable=False)
+    show_time = db.Column(db.DateTime(), nullable=False)
 
     def __repr__(self):
-      return f'<Show: {self.id} - {self.venue_id} - {self.artist_id} / {self.start_time}>'
+      return f'<Show: {self.id} - {self.venue_id} - {self.artist_id} / {self.show_time}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -105,7 +135,7 @@ def format_datetime(value, format='medium'):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
-#----------------------------------------------------------------------------#
+#----------------------------------------------------------------~------------#
 # Controllers.
 #----------------------------------------------------------------------------#
 
@@ -117,24 +147,27 @@ def index():
 #  Venues
 #  ----------------------------------------------------------------#
 
+
 @app.route('/venues')
 def venues():
 
   current_time = datetime.now().strftime('%Y-%m-%d %H:%S:%M')
   data = []
   
-  area = Venue.query.with_entities(Venue.city, Venue.state).distinct().all()  
+  area = Venue.query.with_entities(Venue.city, Venue.state, Venue.country).distinct().all() 
   for location in area:
     city = location[0]
     state = location[1]
-    venues = Venue.query.filter_by(city=city, state=state).all()
-    upcoming_shows = Venue.shows.filter(Show.start_time > current_time).all()
+    country = location[2]
+    venues = Venue.query.filter_by(city=city, state=state, country=country).all()
+    shows = Venue.num_upcoming_shows
+
     data.append({
       "city": city,
       "state": state,
+      "country": country,
       "venues": venues,
-      "now": current_time,
-      #"num_upcoming_shows": len(upcoming_shows)
+      "shows": shows
       })
 
   return render_template('pages/venues.html', areas=data)
@@ -275,11 +308,32 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = VenueForm(request.form)
+
+  try:
+    new_venue = Venue(
+      name=form.name.data,
+      city=form.city.data,
+      state=form.state.data,
+      address=form.address.data,
+      phone=form.phone.data,
+      genres=form.genres.data,
+#      facebook_link=form.facebook_link.data,
+      image_link=form.image_link.data,
+#      website=form.website.data,
+#      seeking_talent=form.seeking_talent.data,
+#      seeking_description=form.seeking_description.data
+    )
+    Venue.create(new_venue)
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
+  except ValueError: 
+    flash('Error occurred. Venue ' + form.name + ' could not be listed.')
+
+  return render_template('pages/home.html')
 
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  # flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
