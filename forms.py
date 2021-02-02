@@ -82,6 +82,9 @@ class VenueForm(Form):
     address = StringField(
         'address', validators=[DataRequired()]
     )
+    country = StringField(
+        'country', validators=[DataRequired()]
+    )
     phone = StringField(
         'phone'
     )

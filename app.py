@@ -172,32 +172,6 @@ def venues():
 
   return render_template('pages/venues.html', areas=data)
 
-# '''
-#   # TODO: replace with real venues data.
-#   #       num_shows should be aggregated based on number of upcoming shows per venue.
-#   data_OLD=[{
-#     "city": "San Francisco",
-#     "state": "CA",
-#     "venues": [{
-#       "id": 1,
-#       "name": "The Musical Hop",
-#       "num_upcoming_shows": 0,
-#     }, {
-#       "id": 3,
-#       "name": "Park Square Live Music & Coffee",
-#       "num_upcoming_shows": 1,
-#     }]
-#   }, {
-#     "city": "New York",
-#     "state": "NY",
-#     "venues": [{
-#       "id": 2,
-#       "name": "The Dueling Pianos Bar",
-#       "num_upcoming_shows": 0,
-#     }]
-#   }]
-#   return render_template('pages/venues.html', areas=data);
-# '''
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -318,11 +292,11 @@ def create_venue_submission():
       address=form.address.data,
       phone=form.phone.data,
       genres=form.genres.data,
-#      facebook_link=form.facebook_link.data,
+      facebook_link=form.facebook_link.data,
       image_link=form.image_link.data,
-#      website=form.website.data,
-#      seeking_talent=form.seeking_talent.data,
-#      seeking_description=form.seeking_description.data
+      website=form.website.data,
+      seeking_talent=form.seeking_talent.data,
+      seeking_description=form.seeking_description.data
     )
     Venue.create(new_venue)
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
@@ -330,13 +304,6 @@ def create_venue_submission():
   except ValueError: 
     flash('Error occurred. Venue ' + form.name + ' could not be listed.')
 
-  return render_template('pages/home.html')
-
-  # on successful db insert, flash success
-  # flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
