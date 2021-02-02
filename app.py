@@ -102,6 +102,10 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     booked_shows = db.relationship('Show', backref='artist', lazy=True)
 
+    def create(self):
+      db.session.add(self)
+      db.session.commit()
+
     def __repr__(self):
       return f'<Artist: {self.id} - {self.name}>'
 
@@ -321,16 +325,7 @@ def delete_venue(venue_id):
 def artists():
   return render_template('pages/artists.html', artists=Artist.query.all())
   # TODO: replace with real data returned from querying the database
-  data=[{
-    "id": 4,
-    "name": "Guns N Petals",
-  }, {
-    "id": 5,
-    "name": "Matt Quevedo",
-  }, {
-    "id": 6,
-    "name": "The Wild Sax Band",
-  }]
+
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
@@ -490,15 +485,40 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+  form = ArtistForm(request.form)
+
+  try:
+    new_artist = Artist(
+      name=form.name.data,
+      city=form.city.data,
+      state=form.state.data,
+      phone=form.phone.data,
+      genres=form.genres.data,
+      facebook_link=form.facebook_link.data,
+    )
+    Artist.create(new_artist)
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+
+  except ValueError: 
+    flash('Error occurred. Artist ' + form.name + ' could not be listed.')
+
+  return render_template('pages/home.html')
+
+@app.route('/artists/<artist_id>', methods=['DELETE'])
+
+
+
+
+
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
   # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+#  flash('Artist ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+#  return render_template('pages/home.html')
 
 
 #  Shows
