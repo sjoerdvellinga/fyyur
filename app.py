@@ -83,10 +83,11 @@ class Venue(db.Model):
 
     @property
     def search(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-        }
+      return {
+        'id': self.id,
+        'name': self.name, 
+        'image_link': self.image_link,
+      }
 
     def __repr__(self):
       return f'<Venue: {self.id} - {self.name} - {self.description}>'
@@ -112,6 +113,14 @@ class Artist(db.Model):
     def create(self):
       db.session.add(self)
       db.session.commit()
+
+    @property
+    def search(self):
+      return {
+        'id': self.id,
+        'name': self.name,
+        'image_link': self.image_link,
+      }
 
     def __repr__(self):
       return f'<Artist: {self.id} - {self.name}>'
@@ -185,12 +194,11 @@ def venues():
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
-  search = request.form.get('search_term', '')
-  venues = Venue.query.filter(Venue.name.ilike("%" + search + "%")).all()
+  found_venues = Venue.query.filter(Venue.name.ilike("%" + request.form.get('search_term', '') + "%")).all()
   response = {
-    "count": len(venues),
+    "count": len(found_venues),
     "data": [
-      venue.search for venue in venues
+      venue.search for venue in found_venues
     ]
   }
 
@@ -338,17 +346,20 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
+  found_artists = Artist.query.filter(Artist.name.ilike("%" + request.form.get('search_term', '') + "%")).all()
+  response = {
+    "count": len(found_artists),
+    "data": [
+      artist.search for artist in found_artists
+    ]
+  }
+
+
+
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
-  response={
-    "count": 1,
-    "data": [{
-      "id": 4,
-      "name": "Guns N Petals",
-      "num_upcoming_shows": 0,
-    }]
-  }
+
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/artists/<int:artist_id>')
