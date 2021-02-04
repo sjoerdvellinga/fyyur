@@ -156,6 +156,10 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey(Artist.id), nullable=False)
     show_time = db.Column(db.DateTime(), nullable=False)
 
+    def create(self):
+      db.session.add(self)
+      db.session.commit()
+
     def __repr__(self):
       return f'<Show: {self.id} - {self.venue_id} - {self.artist_id} / {self.show_time}>'
 
@@ -633,15 +637,37 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+  form = ShowForm(request.form)
+
+  try:
+    new_show = Show(
+      venue_id=form.venue_id.data,
+      artist_id=form.artist_id.data,
+      show_time=form.start_time.data,
+    )
+    Show.create(new_show)
+    flash('Show was successfully listed!')
+  except ValueError: 
+    flash('An error occurred. Show could not be listed.')
+
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
 
   # on successful db insert, flash success
-  flash('Show was successfully listed!')
+  #flash('Show was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Show could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
+
+
+@app.route('/artists/<artist_id>', methods=['DELETE'])
+
+
+
+
+
+
 
 @app.errorhandler(404)
 def not_found_error(error):
