@@ -255,40 +255,6 @@ def show_venue(venue_id):
   #data = list(filter(lambda d: d['id'] == venue_id, venues))[0]
   return render_template('pages/show_venue.html', venue=data)
 
-
-
-
-  # data = []
-  # venues = Venue.query.all()
-
-  # for venue in venues:
-  #   data.extend([{
-  #     "id": venue.id,
-  #     "name": venue.name,
-  #     "genres": venue.genres,
-  #     "address": "BIKBERGERWEG 35",
-  #     "city": venue.city,
-  #     "state": venue.state,
-  #     "country": venue.country,
-  #     "phone": venue.phone,
-  #     "website": venue.website,
-  #     "facebook_link": venue.facebook_link,
-  #     "seeking_talent": venue.seek_talent,
-  #     "seeking_description": venue.seek_description,
-  #     "image_link": venue.image_link,
-  #     "past_shows": [{
-  #       "artist_id": "artist id...",
-  #       "artist_name": "artist name...",
-  #       "artist_image_link": "artist image_link ...",
-  #       "start_time": "artist Show_time...",
-  #   }],
-  #   "upcoming_shows": [],
-  #   "past_shows_count": 1,
-  #   "upcoming_shows_count": 0,
-  #   }])
- 
-  #return render_template('pages/show_venue.html', venue=data)
-
 #  Create Venue
 #  ----------------------------------------------------------------
 
