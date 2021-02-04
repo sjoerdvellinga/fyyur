@@ -102,7 +102,7 @@ class Artist(db.Model):
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String))    
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default=False)
@@ -296,8 +296,6 @@ def create_venue_submission():
       facebook_link=form.facebook_link.data,
       image_link=form.image_link.data,
       website=form.website.data,
-      seeking_talent=form.seeking_talent.data,
-      seeking_description=form.seeking_description.data
     )
     Venue.create(new_venue)
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
