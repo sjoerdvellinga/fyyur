@@ -315,13 +315,13 @@ def delete_venue(venue_id):
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
     Venue.query.filter_by(id=venue_id).delete()
     try:
-        db.session.commit()
-        flash("The venue with id %r has been deleted" % venue_id)
+      db.session.commit()
+      flash("Venue %r has been succesfully deleted from FYYUR" % venue_name)
     except:
-        db.session.rollback()
-        flash("The venue with id %r was not deleted" % venue_id)
+      db.session.rollback()
+      flash("There was an error, venue %r could not deleted" % venue_name)
     finally:
-        db.session.close()
+      db.session.close()
 
     return redirect(url_for('venues'))
   
