@@ -74,6 +74,24 @@
 		{% endfor %}
 	</div>
 </section>
-
+<section>
+	<form action="{{venue.id}}/delete" method="GET">
+		<button type="button"class="btn btn-danger btn-margin" data-id={{venue.id}} onclick="handleVenueDelete(event)"> Delete Venue from FYYUR</button>
+	</form>
+</section>
+<!-- TODO: move script to Static/JS script file -->
+<script>
+	function handleVenueDelete(evt) {
+		fetch('/venues/' + evt.target.dataset.id, {
+			method: "DELETE" 
+		})
+		.then(() => {
+			window.location.href = "/venues"
+		})
+  		.catch(err => {
+    	alert('Error ' + err)
+  		})
+	}
+</script>
 {% endblock %}
 
