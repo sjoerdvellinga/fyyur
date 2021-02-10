@@ -482,28 +482,79 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
-  artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-  }
+  artist = Artist.query.get(artist_id)
+  if artist:
+    form.id.data = artist.id
+    form.name.data = artist.name
+    form.city.data = artist.city
+    form.state.data = artist.state
+    form.phone.data = artist.phone
+    form.genres.data = artist.genres
+    form.website.data = artist.website
+    form.facebook_link.data = artist.facebook_link
+    form.image_link.data = artist.image_link
+    form.seeking_venue = artist.seeking_venue
+    form.num_upcoming_shows.data = artist.num_upcoming_shows
+    #   "id": artist.,
+    #   "name": artist.,
+    #   "genres": artist.genres,
+    #   "city": artist.,
+    #   "state": artist.,
+    #   "phone": artist.,
+    #   "website": artist.,
+    #   "facebook_link": artist.,
+    #   "seeking_venue": True if artist.seeking_venue in (True, 't', 'True') else False,
+    #   "seeking_description":  artist.seeking_description,
+    #   "": artist.image_link if artist.image_link else "",
+    #   "past_shows_count": artist.num_past_shows,
+    #   "upcoming_shows_count": artist.num_upcoming_shows,
+  
+    return render_template('forms/edit_artist.html', form=form, artist=artist)
+
+  #   "id": 4,
+  #   "name": "Guns N Petals",
+  #   "genres": ["Rock n Roll"],
+  #   "city": "San Francisco",
+  #   "state": "CA",
+  #   "phone": "326-123-5000",
+  #   "website": "https://www.gunsnpetalsband.com",
+  #   "facebook_link": "https://www.facebook.com/GunsNPetals",
+  #   "seeking_venue": True,
+  #   "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
+  #   "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
+  # }
   # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=artist)
+
+
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+  data = request.form
+  artist = Artist.query.get(artist_id)
+  prev_name = artist.name
+  artist.name = data.get('name')
+  artist.city = data.get('city')
+  artist.state = data.get('state')
+  artist.address = data.get('address')
+  artist.phone = data.get('phone')
+  artist.genres = ", ".join(data.getlist('genres'))
+  artist.facebook_link = data.get('facebook_link')
+  try:
+    db.session.commit()
+    flash('Artist ' + prev_name + ' was successfully updated!')
+  except:
+    db.session.rollback()
+    flash('An error occurred. Artist ' +
+      prev_name + ' could not be updated.')
+  finally:
+    db.session.close()
+
+  return redirect(url_for('show_artist', artist_id=artist_id))
+
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
+  # return redirect(url_for('show_artist', artist_id=artist_id))
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):

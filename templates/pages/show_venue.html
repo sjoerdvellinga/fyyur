@@ -81,8 +81,8 @@
 </section>
 <!-- TODO: move script to Static/JS script file -->
 <script>
-	function handleVenueDelete(evt) {
-		fetch('/venues/' + evt.target.dataset.id, {
+	function handleVenueDelete(event) {
+		fetch('/venues/' + event.target.dataset.id, {
 			method: "DELETE" 
 		})
 		.then(() => {
@@ -93,5 +93,6 @@
   		})
 	}
 </script>
+
 {% endblock %}
 
