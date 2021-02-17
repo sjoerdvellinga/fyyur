@@ -75,8 +75,13 @@
 	</div>
 </section>
 <section>
+	<form action="{{venue.id}}/edit" method="GET">
+		<button type="submit" class="btn btn-primary btn-lg btn-margin">Edit profile</button>
+	</form>
+</section>
+<section>
 	<form action="{{venue.id}}/delete" method="GET">
-		<button type="button"class="btn btn-danger btn-margin" data-id={{venue.id}} onclick="handleVenueDelete(event)"> Delete Venue from FYYUR</button>
+			<button type="button"class="btn btn-danger btn-lg btn-margin" data-id={{venue.id}} onclick="handleVenueDelete(event)"> Delete Venue from FYYUR</button>
 	</form>
 </section>
 <!-- TODO: move script to Static/JS script file -->
