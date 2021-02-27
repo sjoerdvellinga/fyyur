@@ -123,7 +123,7 @@ class Artist(db.Model):
         'name': self.name,
         'image_link': self.image_link,
       }
-
+    
     @property 
     def upcoming_shows(self):
       upcoming_shows = [show for show in self.booked_shows if show.show_time > datetime.now()]
@@ -595,14 +595,32 @@ def create_show_submission():
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
+# delete artist route handler
+@app.route('/artists/<int:artist_id>', methods=['DELETE'])
+def delete_artist(artist_id):
+  
+  error = False
 
-@app.route('/artists/<artist_id>', methods=['DELETE'])
-
-
-
-
-
-
+  try:
+    artist = Artist.query.get(artist_id)
+    num_shows_delete = str(len(artist.booked_shows))
+    # delete shows for artist from database
+    for show in artist.booked_shows:
+      db.session.delete(show)
+    #delete artist from database
+    db.session.delete(artist)
+    db.session.commit()
+    flash('Deletion of artist ' + artist.name + ' was succesfull. ' + num_shows_delete + ' shows will be deleted as well')
+  except():
+    db.session.rollback()
+    error = True
+    flash("Error, deletion of artist rolled-back)")
+  finally:
+    db.session.close()
+  if error:
+    abort(500)
+  else:
+    return redirect(url_for('artists'))
 
 @app.errorhandler(404)
 def not_found_error(error):
