@@ -137,21 +137,27 @@ class Artist(db.Model):
     
     @property         #get shows planned in future date/time for artist
     def upcoming_shows(self):
-      upcoming_shows = [show for show in self.booked_shows if show.show_time > datetime.now()]
+      upcoming_shows = db.session.query(Show).join(Artist).filter(Show.artist_id==self.id).filter(Show.show_time>datetime.now()).all()
+      upcoming_shows = []
+
       return upcoming_shows
 
     @property         #get shows for artist which started already or which where in the past
     def past_shows(self):
-      past_shows = [show for show in self.booked_shows if show.show_time < datetime.now()]
+      past_shows = db.session.query(Show).join(Artist).filter(Show.artist_id==self.id).filter(Show.show_time<datetime.now()).all()
+      past_shows = []
+      
       return past_shows
     
     @property         #gcount n umber ofshows for artist which started already or which where in the past
     def num_past_shows(self):
-      return len(self.past_shows)
+      num_past_shows = len(db.session.query(Show).filter(Show.artist_id == self.id).filter(Show.show_time < datetime.now()).all())
+      return num_past_shows
 
     @property         #count number of shows planned in future date/time for artist
     def num_upcoming_shows(self):
-      return len(self.upcoming_shows)
+      num_upcoming_shows = len(db.session.query(Show).filter(Show.artist_id == self.id).filter(Show.show_time > datetime.now()).all())
+      return num_upcoming_shows
 
     def __repr__(self):
       return f'<Artist: {self.id} - {self.name}>'
@@ -394,36 +400,19 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   artist = Artist.query.get(artist_id)
-  if artist:
-    data={
-      "id": artist.id,
-      "name": artist.name,
-      "genres": artist.genres,
-      "city": artist.city,
-      "state": artist.state,
-      "phone": artist.phone,
-      "website": artist.website,
-      "facebook_link": artist.facebook_link,
-      "seeking_venue": True if artist.seeking_venue in (True, 't', 'True') else False,
-      "seeking_description":  artist.seeking_description,
-      "image_link": artist.image_link if artist.image_link else "",
-      "past_shows_count": artist.num_past_shows,
-      "upcoming_shows_count": artist.num_upcoming_shows,
-    }
-  
-  past_shows = []
+
+  if not artist: 
+    return render_template('errors/404.html')
+
   for show in artist.past_shows:
-    venue = Venue.query.get(show.venue_id)
     past_shows.append({
         "venue_id": show.venue_id,
-        "venuename": venue.name,
+        "venue_name": venue.name,
         "venue_image_link": venue.image_link,
         "start_time": str(show.show_time)
     })
     
-  upcoming_shows = []
   for show in artist.upcoming_shows:
-    venue = Venue.query.get(show.venue_id)
     upcoming_shows.append({
         "venue_id": show.venue_id,
         "venue_name": venue.name,
@@ -431,10 +420,28 @@ def show_artist(artist_id):
         "start_time": str(show.show_time)
     })
 
-  data["past_shows"] = past_shows
-  data["upcoming_shows"] = upcoming_shows
+
+  data={
+    "id": artist.id,
+    "name": artist.name,
+    "genres": artist.genres,
+    "city": artist.city,
+    "state": artist.state,
+    "phone": artist.phone,
+    "website": artist.website,
+    "facebook_link": artist.facebook_link,
+    "seeking_venue": True if artist.seeking_venue in (True, 't', 'True') else False,
+    "seeking_description":  artist.seeking_description,
+    "image_link": artist.image_link if artist.image_link else "",
+    "past_shows_count": artist.num_past_shows,
+    "upcoming_shows_count": artist.num_upcoming_shows,
+    }
 
   return render_template('pages/show_artist.html', artist=data)
+
+
+
+
 
 #  Update
 #  ----------------------------------------------------------------
