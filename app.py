@@ -283,55 +283,8 @@ def show_venue(venue_id):
     "upcoming_shows_count": venue.num_upcoming_shows,
   }
 
+  # data = list(filter(lambda d: d['id'] == venue_id, venues))[0]
   return render_template('pages/show_venue.html', venue=data)
-
-
-
-
-  # venue = Venue.query.get(venue_id)
-  # if venue:
-  #   data={
-  #     "id": venue.id,
-  #     "name": venue.name,
-  #     "genres": venue.genres,
-  #     "address": venue.address,
-  #     "city": venue.city,
-  #     "state": venue.state,
-  #     "phone": venue.phone,
-  #     "website": venue.website,
-  #     "facebook_link": venue.facebook_link,
-  #     "seeking_talent": True if venue.seek_talent in (True, 't', 'True') else False,
-  #     "seeking_description": venue.seek_description,
-  #     "image_link": venue.image_link if venue.image_link else "",
-  #     "past_shows_count": venue.num_past_shows,
-  #     "upcoming_shows_count": venue.num_upcoming_shows,
-  #   }
-  
-  # past_shows = []
-  # for show in venue.past_shows:
-  #   artist = Artist.query.get(show.artist_id)
-  #   past_shows.append({
-  #       "artist_id": show.artist_id,
-  #       "artist_name": artist.name,
-  #       "artist_image_link": artist.image_link,
-  #       "start_time": str(show.show_time)
-  #   })
-    
-  # upcoming_shows = []
-  # for show in venue.upcoming_shows:
-  #   artist = Artist.query.get(show.artist_id)
-  #   upcoming_shows.append({
-  #       "artist_id": show.artist_id,
-  #       "artist_name": artist.name,
-  #       "artist_image_link": artist.image_link,
-  #       "start_time": str(show.show_time)
-  #   })
-
-  # data["past_shows"] = past_shows
-  # data["upcoming_shows"] = upcoming_shows
-  
-  # #data = list(filter(lambda d: d['id'] == venue_id, venues))[0]
-  # return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -357,6 +310,7 @@ def create_venue_submission():
       image_link=form.image_link.data,
       website=form.website.data,
     )
+
     Venue.create(new_venue)
     flash('Venue ' + request.form['name'] + ' was successfully listed!')
 
