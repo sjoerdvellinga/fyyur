@@ -6,7 +6,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -154,26 +154,33 @@ def create_venue_form():
 def create_venue_submission():
   form = VenueForm(request.form)
 
-  try:
-    new_venue = Venue(
-      name=form.name.data,
-      city=form.city.data,
-      state=form.state.data,
-      address=form.address.data,
-      phone=form.phone.data,
-      genres=form.genres.data,
-      facebook_link=form.facebook_link.data,
-      image_link=form.image_link.data,
-      website=form.website.data,
+  if form.validate_on_submit():
+    try:
+      new_venue = Venue(
+        name=form.name.data,
+        city=form.city.data,
+        state=form.state.data,
+        address=form.address.data,
+        phone=form.phone.data,
+        genres=form.genres.data,
+        facebook_link=form.facebook_link.data,
+        image_link=form.image_link.data,
+        website=form.website.data,
+      )
+
+      Venue.create(new_venue)
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
+    except ValueError: 
+      flash('Error occurred. Venue ' + form.name + ' could not be listed.')
+
+    return render_template('pages/home.html')
+
+  return render_template(
+    'forms/new_venue.html',
+    form=form,
+    template='forms/new_venue.html'
     )
-
-    Venue.create(new_venue)
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
-
-  except ValueError: 
-    flash('Error occurred. Venue ' + form.name + ' could not be listed.')
-
-  return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -344,26 +351,69 @@ def create_artist_form():
   form = ArtistForm()
   return render_template('forms/new_artist.html', form=form)
 
+
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   form = ArtistForm(request.form)
 
-  try:
-    new_artist = Artist(
-      name=form.name.data,
-      city=form.city.data,
-      state=form.state.data,
-      phone=form.phone.data,
-      genres=form.genres.data,
-      facebook_link=form.facebook_link.data,
+  if form.validate_on_submit():
+    try:
+      new_artist = Artist(
+        name=form.name.data,
+        city=form.city.data,
+        state=form.state.data,
+        phone=form.phone.data,
+        genres=form.genres.data,
+        facebook_link=form.facebook_link.data,
+        image_link=form.image_link.data,
+        website=form.website.data,
+      )
+
+      Artist.create(new_artist)
+      flash('Artist ' + request.form['name'] + ' was successfully listed!')
+
+    except ValueError: 
+      flash('Error occurred. Artist ' + form.name + ' could not be listed.')
+
+    return render_template('pages/home.html')
+
+  return render_template(
+    'forms/new_artist.html',
+    form=form,
+    template='forms/new_artist.html'
     )
-    Artist.create(new_artist)
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
 
-  except ValueError: 
-    flash('Error occurred. Artist ' + form.name + ' could not be listed.')
 
-  return render_template('pages/home.html')
+
+
+# @app.route('/artists/create', methods=['POST'])
+# def create_artist_submission():
+#   form = ArtistForm(request.form)
+
+#   if form.validate_on_submit():
+#     try:
+#       new_artist = Artist( 
+#         name = form.name.data,
+#         city = form.city.data,
+#         state = form.state.data,
+#         phone = form.phone.data,
+#         genres = form.genres.data,
+#         image_link = form.image_link.data,
+#         facebook_link = form.facebook_link.data,
+#         seeking_venue = form.seeking_venue.data,
+#         seeking_description = form.seeking_description.data,
+#         website = form.website.data,
+#       )
+#       Artist.create(new_artist)
+#       flash('Artist ' + request.form['name'] + ' was successfully listed!')
+
+#     except ValueError: 
+#       flash('Error occurred. Artist ' + form.name + ' could not be listed.')
+
+#     return render_template('pages/home.html')
+
+#   return render_template('pages/home.html')
+
 
 #  Shows
 #  ----------------------------------------------------------------
