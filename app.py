@@ -18,7 +18,6 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 import traceback
 import sys
-from models import *
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -33,6 +32,11 @@ migrate = Migrate(app, db)
 # See config.py for connection to local postgresql database
 # See models.py database model/tables
 
+#----------------------------------------------------------------------------#
+# Models.
+#----------------------------------------------------------------------------#
+
+from models import *
 
 #----------------------------------------------------------------------------#
 # Filters.
